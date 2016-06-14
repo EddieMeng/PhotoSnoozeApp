@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PhotoSnoozeActionBar">
+        <attr name="showMenuItem" format = "boolean"/>
+        <attr name="showTitle" format = "boolean"/>
+        <attr name="navigationBackImgae" format="reference"/>
+        <attr name="navigationBackText" format="string"/>
+        <attr name="titleText" format="string"/>
+    </declare-styleable>
+</resources>
