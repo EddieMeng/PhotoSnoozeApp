@@ -11,7 +11,6 @@ public class Contacts implements Serializable{
     private transient ImageView avatar;
     private String name;
 
-
     public Contacts(ImageView avatar, String name) {
         this.avatar = avatar;
         this.name = name;

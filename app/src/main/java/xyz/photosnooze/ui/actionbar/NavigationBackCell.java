@@ -26,31 +26,6 @@ public class NavigationBackCell extends LinearLayout{
     }
 
 
-//    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        int width = MeasureSpec.getSize(widthMeasureSpec);
-//        int height = MeasureSpec.getSize(heightMeasureSpec);
-//
-//        navigationBackView.measure(MeasureSpec.makeMeasureSpec(66, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(70, MeasureSpec.EXACTLY));
-//        if (iconImage != null) {
-//            iconImage.measure(MeasureSpec.makeMeasureSpec(iconImage.getDrawable().getIntrinsicWidth(), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(iconImage.getDrawable().getIntrinsicHeight(), MeasureSpec.EXACTLY));
-//        }
-//
-//        if (navigationBackView != null) {
-//            int availableWidth = width - navigationBackView.getMeasuredWidth() - getPaddingLeft();
-//            navigationBackView.measure(MeasureSpec.makeMeasureSpec(availableWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST));
-//        }
-//        setMeasuredDimension(navigationBackView.getMeasuredWidth() + (iconImage != null && navigationTextView == null ? iconImage.getDrawable().getIntrinsicWidth() : navigationTextView.getMeasuredWidth()), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
-//    }
-//
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        Toast.makeText(getContext(), "Notiy", Toast.LENGTH_SHORT).show();
-//        return true;
-//    }
-
-
-
     public NavigationBackCell addNavigationImage(Context context) {
         navigationBackView = new NavigationBackView(context);
 
@@ -61,9 +36,10 @@ public class NavigationBackCell extends LinearLayout{
 
     public NavigationBackCell addImageIcon(Context context, int resId) {
         iconImage = new ImageView(context);
+        iconImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         iconImage.setImageResource(resId);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(60, ViewGroup.LayoutParams.MATCH_PARENT);
         addView(iconImage, params);
         return this;
     }

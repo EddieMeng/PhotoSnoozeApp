@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="xyz.photosnooze">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:name=".messenger.ApplicationLoader"
         android:allowBackup="true"
@@ -9,15 +15,21 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".ui.MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
         </activity>
+
         <activity android:name=".ui.CreateAlarmActivity" />
-        <activity android:name=".ui.FriendListActivity"></activity>
+        <activity android:name=".ui.FriendListActivity" />
+
+        <receiver android:name=".messenger.receiver.AlarmReceiver" />
+
+        <activity android:name=".ui.AlarmRingActivity" />
+        <activity android:name=".ui.PhotoChatActivity" />
     </application>
 
 </manifest>

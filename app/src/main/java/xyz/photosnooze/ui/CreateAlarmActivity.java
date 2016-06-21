@@ -1,8 +1,14 @@
 package xyz.photosnooze.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -15,37 +21,74 @@ import xyz.photosnooze.entity.Contacts;
 import xyz.photosnooze.entity.SnoozePhotoAlarm;
 import xyz.photosnooze.messenger.CalendarUtil;
 import xyz.photosnooze.messenger.MessageStorage;
+import xyz.photosnooze.messenger.receiver.AlarmReceiver;
 import xyz.photosnooze.ui.actionbar.ActionBarMenu;
 import xyz.photosnooze.ui.actionbar.NavigationBackCell;
 import xyz.photosnooze.ui.actionbar.PhotoSnoozeActionBar;
 
 public class CreateAlarmActivity extends BaseActivity {
     private final static int REQUEST_SENDTO_FRIEND = 1;
-    private ArrayList<Integer> currentTime = new ArrayList<>();
 
     private PhotoSnoozeActionBar actionbar;
     private NavigationBackCell navigationBackCell;
-    private TextView sendToButton, weekDayText;
+    private TextView weekDayText;
     private TimePicker timePicker;
+    private DatePicker datePicker;
     private Calendar calendar;
+
+    private static BroadcastReceiver timeTickReceiver;
+    private static CreateAlarmActivity inst;
+    private PendingIntent pendingIntent;
+    private AlarmManager alarmManager;
+
+    private String Today;
+
     private ArrayList<Contacts> contactsList = new ArrayList<>();
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_alarm);
         init();
-        sendToButton.setOnClickListener(new View.OnClickListener() {
+
+        timeTickReceiver = new BroadcastReceiver() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CreateAlarmActivity.this, FriendListActivity.class);
-                startActivityForResult(intent, REQUEST_SENDTO_FRIEND);
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Intent.ACTION_TIME_TICK)) {
+                    long millis = System.currentTimeMillis();
+                    calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(millis);
+
+                    int currentHours = calendar.get(Calendar.HOUR_OF_DAY);
+                    int currentMinutes = calendar.get(Calendar.MINUTE);
+
+                    int timePickerHours = timePicker.getCurrentHour();
+                    int timePickerMinutes = timePicker.getCurrentMinute();
+
+                    if (currentHours > timePickerHours) {
+                        weekDayText.setText(CalendarUtil.WeekDayOfTomorrow());
+                    } else if (currentHours == timePickerHours && currentMinutes >= timePickerMinutes) {
+                        if (timePickerHours >=0) {
+                            weekDayText.setText(CalendarUtil.WeekDayOfTomorrow());
+                        }
+                    } else {
+                        weekDayText.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US));
+                    }
+
+                }
             }
-        });
+        };
+
+        registerReceiver(timeTickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+
                 calendar = Calendar.getInstance();
                 if (calendar.get(Calendar.HOUR_OF_DAY) > hourOfDay) {
                     if (hourOfDay >=0) {
@@ -71,44 +114,60 @@ public class CreateAlarmActivity extends BaseActivity {
     }
 
 
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_SENDTO_FRIEND) {
+//            if (resultCode == RESULT_OK) {
+//                contactsList = (ArrayList<Contacts>) data.getSerializableExtra("contactsChoosen");
+//            }
+//        }
+//    }
+
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SENDTO_FRIEND) {
-            if (resultCode == RESULT_OK) {
-                contactsList = (ArrayList<Contacts>) data.getSerializableExtra("contactsChoosen");
-            }
+    protected void onStart() {
+        super.onStart();
+        inst = this;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (timeTickReceiver != null) {
+            unregisterReceiver(timeTickReceiver);
+            timeTickReceiver = null;
         }
     }
 
     private void init() {
         actionbar = (PhotoSnoozeActionBar) findViewById(R.id.snoozeActionbar);
-        sendToButton = (TextView) findViewById(R.id.sendToBtn);
         weekDayText = (TextView) findViewById(R.id.weekDay);
         timePicker = (TimePicker) findViewById(R.id.timePicker);
         calendar = Calendar.getInstance();
+        datePicker = new DatePicker(this);
+
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         navigationBackCell = actionbar.createNavigationCell();
-        navigationBackCell.addNavigationImage(this).addImageIcon(this, R.mipmap.ic_launcher);
-
+        navigationBackCell.addNavigationImage(this).addImageIcon(this, R.mipmap.app_icon);
 
         actionbar.setActionBarTitle("Create Alarm");
         ActionBarMenu menu = actionbar.createMenu(this);
-        menu.addCancelMenuItem(this).setOnClickListener(new View.OnClickListener() {
+        menu.addCancelImageView(this).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-        menu.addDividerLine(this);
-        menu.addSaveMenuItem(this).setOnClickListener(new View.OnClickListener() {
+        menu.addSaveImageView(this).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveSnoozeAlarm();
             }
         });
 
-        String weekDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        weekDayText.setText(weekDay);
+        Today = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        weekDayText.setText(Today);
 
         timePicker.setIs24HourView(true);
         timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
@@ -119,43 +178,32 @@ public class CreateAlarmActivity extends BaseActivity {
 
 
     private void saveSnoozeAlarm() {
-        if (contactsList.size() > 0) {
-            Contacts contacts = contactsList.get(0);
-            if (contacts != null) {
                 SnoozePhotoAlarm alarm = new SnoozePhotoAlarm();
                 int currentHour = timePicker.getCurrentHour();
                 int currentMinite = timePicker.getCurrentMinute();
-                String currentHourInString = currentHour < 10 ? String.valueOf(0).concat(String.valueOf(currentHour)) : String.valueOf(currentHour);
-                String currentMiniteInString = currentMinite < 10 ? String.valueOf(0).concat(String.valueOf(currentMinite)) : String.valueOf(currentMinite);
-                ArrayList<String> list = new ArrayList<>();
-                list.add(currentHourInString);
-                list.add(currentMiniteInString);
 
-                alarm.setAlarmTime(convertArrayToString(list));
-                alarm.setReceiverName(contacts.getName());
+                if (!(weekDayText.getText().toString().equals(Today))) {
+                    calendar.add(Calendar.DATE, 1);
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH);
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    datePicker.updateDate(year, month, day);
+                }
+                calendar.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth(), currentHour, currentMinite);
+                alarm.setAlarmTime(calendar.getTimeInMillis());
                 alarm.setWeekDay(weekDayText.getText().toString());
 
                 MessageStorage.getInstacne().saveAlarm(alarm);
+
+                Intent myIntent = new Intent(CreateAlarmActivity.this, AlarmReceiver.class);
+                myIntent.setAction(String.valueOf(alarm.getAlarmTime()));
+                pendingIntent = PendingIntent.getBroadcast(CreateAlarmActivity.this, (int)System.currentTimeMillis(), myIntent, 0);
+
+                alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
+
                 Intent intent = new Intent(CreateAlarmActivity.this, MainActivity.class);
+                intent.putExtra("alarmPendingIntent", pendingIntent);
                 startActivity(intent);
-            }
-        } else {
-            showToast("Still Not Choose Friend To Send");
-        }
-
     }
-
-    private String convertArrayToString(ArrayList<String> stringArray) {
-        String result = "";
-        for (int i = 0; i < stringArray.size(); i++) {
-            if (i == (stringArray.size() - 1)) {
-                result = result.concat(stringArray.get(i));
-            } else {
-                result = result.concat(stringArray.get(i)).concat(",");
-            }
-        }
-        return result;
-    }
-
 
 }

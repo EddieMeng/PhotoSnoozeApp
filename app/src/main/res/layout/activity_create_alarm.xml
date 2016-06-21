@@ -45,22 +45,17 @@
         android:background="@android:color/darker_gray"
         />
 
-    <TextView
-        android:id="@+id/sendToBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Send To"
-        android:padding="15dp"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:background="?android:attr/selectableItemBackground"
-        />
+    <!--<TextView-->
+        <!--android:id="@+id/sendToBtn"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Send To"-->
+        <!--android:padding="15dp"-->
+        <!--android:textSize="20sp"-->
+        <!--android:gravity="center"-->
+        <!--android:background="?android:attr/selectableItemBackground"-->
+        <!--/>-->
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/darker_gray"
-        />
 
 
 

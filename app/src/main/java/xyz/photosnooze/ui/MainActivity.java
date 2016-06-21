@@ -1,5 +1,7 @@
 package xyz.photosnooze.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +14,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +32,15 @@ public class MainActivity extends BaseActivity implements NotificationCenter.Not
     private ImageView addAlarmButton;
     private RecyclerView alarmRecyclerView;
     private PhotoSnoozeActionBar actionBar;
+    private TextView emptyAlarmView;
 
-    private List<SnoozePhotoAlarm> alarmList;
+    private List<SnoozePhotoAlarm> alarmList = new ArrayList<>();
     private AlarmListAdapter alarmAdapter;
+    private Intent intent;
+    private PendingIntent alarmPendingIntent;
+    private AlarmManager alarmManager;
+
+    private long firstPressedBackTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,11 @@ public class MainActivity extends BaseActivity implements NotificationCenter.Not
         setContentView(R.layout.activity_main);
         ApplicationLoader.postInitApplication();
         init();
+        intent = getIntent();
+        if  (intent.getParcelableExtra("alarmPendingIntent") != null) {
+            alarmPendingIntent = (PendingIntent) intent.getParcelableExtra("alarmPendingIntent");
+        }
+
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.snoozePhotoAlarmDidLoaded);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.snoozePhotoAlarmDidDeleted);
 
@@ -70,10 +83,18 @@ public class MainActivity extends BaseActivity implements NotificationCenter.Not
                     public void onClick(DialogInterface dialog, int which) {
                         MessageStorage.getInstacne().deleteAlarm(snoozePhotoAlarm);
                         alarmList.remove(snoozePhotoAlarm);
+
+                        if (alarmPendingIntent != null) {
+                        alarmManager.cancel(alarmPendingIntent);
+                        alarmPendingIntent.cancel();
+                        }
+
+                        if (alarmList.size() == 0) {
+                            emptyAlarmView.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
-                AlertDialog dialog = builder.show();
-
+                builder.show();
             }
         }));
     }
@@ -89,24 +110,25 @@ public class MainActivity extends BaseActivity implements NotificationCenter.Not
         actionBar = (PhotoSnoozeActionBar) findViewById(R.id.actionbar_main);
         alarmRecyclerView = (RecyclerView) findViewById(R.id.alarmView);
         addAlarmButton = (ImageView) findViewById(R.id.addAlarmButton);
-    }
+        emptyAlarmView = (TextView) findViewById(R.id.emptyAlarmView);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+        alarmRecyclerView.setLayoutManager(layoutManager);
+        alarmRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        alarmRecyclerView.addItemDecoration(new DividerItemDecoration(MainActivity.this, LinearLayoutManager.VERTICAL));
+        alarmAdapter = new AlarmListAdapter(MainActivity.this, alarmList);
+        alarmRecyclerView.setAdapter(alarmAdapter);
+    }
 
     @Override
     public void didReceivedNotification(int id, Object... args) {
         if (id == NotificationCenter.snoozePhotoAlarmDidLoaded) {
             alarmList = (ArrayList<SnoozePhotoAlarm>) args[0];
-            if (alarmAdapter != null) {
+            if (alarmList.size() > 0 && alarmAdapter != null) {
                 alarmAdapter.upDateContaceList(alarmList);
-            } else {
-                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
-                alarmRecyclerView.setLayoutManager(layoutManager);
-                alarmRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                alarmRecyclerView.addItemDecoration(new DividerItemDecoration(MainActivity.this, LinearLayoutManager.VERTICAL));
-                alarmAdapter = new AlarmListAdapter(MainActivity.this, alarmList);
-                alarmRecyclerView.setAdapter(alarmAdapter);
-                alarmAdapter.notifyDataSetChanged();
-                Toast.makeText(MainActivity.this, "Yep", Toast.LENGTH_SHORT).show();
+            }else {
+                emptyAlarmView.setVisibility(View.VISIBLE);
             }
         } else if (id == NotificationCenter.snoozePhotoAlarmDidDeleted) {
             if (alarmAdapter != null) {
@@ -141,7 +163,6 @@ public class MainActivity extends BaseActivity implements NotificationCenter.Not
                     return true;
                 }
             });
-
         }
 
 
@@ -165,4 +186,15 @@ public class MainActivity extends BaseActivity implements NotificationCenter.Not
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        long currentTime = System.currentTimeMillis();
+        if  (currentTime - firstPressedBackTime < 1000) {
+            finish();
+            System.exit(0);
+        } else {
+            showToast("Press again will exit the app");
+        }
+        firstPressedBackTime = currentTime;
+    }
 }

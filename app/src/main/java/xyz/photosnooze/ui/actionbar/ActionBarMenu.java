@@ -3,9 +3,11 @@ package xyz.photosnooze.ui.actionbar;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import xyz.photosnooze.R;
 import xyz.photosnooze.ui.components.cell.DividerCell;
 
 /**
@@ -13,6 +15,7 @@ import xyz.photosnooze.ui.components.cell.DividerCell;
  */
 public class ActionBarMenu extends LinearLayout{
     private TextView canCelTextView, saveTextView;
+    private ImageView canCelImgaeView, saveImgaeView;
     private DividerCell dividerLine;
 
 
@@ -38,6 +41,28 @@ public class ActionBarMenu extends LinearLayout{
         params.gravity = Gravity.CENTER_VERTICAL;
         addView(canCelTextView,params);
         return canCelTextView;
+    }
+
+    public ImageView addCancelImageView(Context context) {
+        canCelImgaeView = new ImageView(context);
+        canCelImgaeView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(60, ViewGroup.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER_VERTICAL;
+        addView(canCelImgaeView, params);
+        canCelImgaeView.setImageResource(R.mipmap.img_cancel);
+        return canCelImgaeView;
+    }
+
+
+    public ImageView addSaveImageView(Context context) {
+        saveImgaeView = new ImageView(context);
+        saveImgaeView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, ViewGroup.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER_VERTICAL;
+        params.leftMargin = 10;
+        addView(saveImgaeView, params);
+        saveImgaeView.setImageResource(R.mipmap.img_save_alarm);
+        return saveImgaeView;
     }
 
     public TextView addSaveMenuItem(Context context) {

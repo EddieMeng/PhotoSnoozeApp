@@ -32,10 +32,8 @@ public class PhotoSnoozeActionBar extends FrameLayout{
 
     public PhotoSnoozeActionBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setPadding(0, 0, 10, 0);
         setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
     }
-
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -58,14 +56,14 @@ public class PhotoSnoozeActionBar extends FrameLayout{
 
         if (menu != null) {
             int availableWidth = width - (navigationBackCell != null ? navigationBackCell.getMeasuredWidth() : 0) - (titleTextView != null ? titleTextView.getMeasuredWidth() : 0)- getPaddingLeft();
-            menu.measure(MeasureSpec.makeMeasureSpec(availableWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(actionbarHeight - 20, MeasureSpec.AT_MOST));
+            menu.measure(MeasureSpec.makeMeasureSpec(availableWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(actionbarHeight, MeasureSpec.EXACTLY));
         }
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if (navigationBackCell != null) {
-            navigationBackCell.layout(getPaddingLeft(), getPaddingTop(), getPaddingLeft() + navigationBackCell.getMeasuredWidth(), getPaddingTop() + navigationBackCell.getMeasuredHeight());
+            navigationBackCell.layout(getPaddingLeft(), 0, getPaddingLeft() + navigationBackCell.getMeasuredWidth(), navigationBackCell.getMeasuredHeight());
         }
 
         if (titleTextView != null) {
@@ -78,9 +76,9 @@ public class PhotoSnoozeActionBar extends FrameLayout{
         }
 
         if (menu != null) {
-            int leftPosition = right - left - menu.getMeasuredWidth() - getPaddingRight();
-            int topPosition = getMeasuredHeight() / 2 - menu.getMeasuredHeight() / 2;
-            int rightPosition = leftPosition + menu.getMeasuredWidth();
+            int topPosition = 0;
+            int rightPosition = getMeasuredWidth();
+            int leftPosition = rightPosition - menu.getMeasuredWidth();
             int bottomPosition = topPosition + menu.getMeasuredHeight();
             menu.layout(leftPosition, topPosition, rightPosition, bottomPosition);
         }

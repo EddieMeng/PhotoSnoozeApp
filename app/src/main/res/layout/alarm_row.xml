@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:clickable="true"
     android:background="?android:attr/selectableItemBackground"
     >
@@ -22,28 +22,27 @@
             android:layout_centerVertical="true"
             />
 
+        <!--<TextView-->
+            <!--android:id="@+id/weekDayTV"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="weekDay"-->
+            <!--android:textSize="20sp"-->
+            <!--android:layout_toRightOf="@+id/timeTextView"-->
+            <!--android:layout_marginLeft="10dp"-->
+            <!--android:layout_alignBottom="@+id/timeTextView"-->
+            <!--/>-->
+
         <TextView
             android:id="@+id/weekDayTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="weekDay"
-            android:textSize="20sp"
-            android:layout_toRightOf="@+id/timeTextView"
-            android:layout_marginLeft="10dp"
-            android:layout_alignBottom="@+id/timeTextView"
-            />
-
-        <TextView
-            android:id="@+id/receiverName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="To Friend"
+            android:text="Weekday"
             android:textSize="20sp"
             android:ellipsize="end"
-            android:layout_alignBottom="@+id/timeTextView"
+            android:layout_centerVertical="true"
             />
-
 
     </RelativeLayout>
 </RelativeLayout>

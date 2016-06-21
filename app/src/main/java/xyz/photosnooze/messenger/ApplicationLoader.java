@@ -8,20 +8,26 @@ import android.os.Handler;
  * Created by shine on 16/6/10.
  */
 public class ApplicationLoader extends Application {
-    public static volatile Context applicatioonContext;
+    public static volatile Context applicationContext;
     public static volatile Handler applicationHandler;
+
+    public volatile static boolean readContacts;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
-        applicatioonContext = getApplicationContext();
-        applicationHandler = new Handler(applicatioonContext.getMainLooper());
+        applicationContext = getApplicationContext();
+        applicationHandler = new Handler(applicationContext.getMainLooper());
     }
 
 
     public static void postInitApplication() {
-        ContactsController.getInstance().readContacts(applicatioonContext);
+        synchronized (ApplicationLoader.class) {
+            if (!readContacts) {
+                ContactsController.getInstance().readContacts(applicationContext);
+            }
+        }
     }
 
 

@@ -40,6 +40,7 @@ public class ContactsController {
             contacts.setAvatar(avatar);
             contactsList.add(contacts);
         }
+        ApplicationLoader.readContacts = true;
     }
 
 

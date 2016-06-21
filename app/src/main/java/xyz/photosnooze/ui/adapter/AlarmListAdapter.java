@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.List;
 
 import xyz.photosnooze.R;
 import xyz.photosnooze.entity.SnoozePhotoAlarm;
+import xyz.photosnooze.messenger.CalendarUtil;
 
 /**
  * Created by shine on 16/6/13.
@@ -19,7 +21,6 @@ import xyz.photosnooze.entity.SnoozePhotoAlarm;
 public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.AlarmViewHolder>{
     private Context mContext;
     private List<SnoozePhotoAlarm> alarmList;
-
 
     public class AlarmViewHolder extends RecyclerView.ViewHolder {
         private TextView timeView, weekDayView, receiverView;
@@ -30,7 +31,6 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
             alarmRow = (RelativeLayout) itemView.findViewById(R.id.alarm_row);
             timeView = (TextView) itemView.findViewById(R.id.timeTextView);
             weekDayView = (TextView) itemView.findViewById(R.id.weekDayTV);
-            receiverView = (TextView) itemView.findViewById(R.id.receiverName);
         }
     }
 
@@ -53,12 +53,13 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
     @Override
     public void onBindViewHolder(AlarmViewHolder holder, int position) {
         SnoozePhotoAlarm alarm = alarmList.get(position);
-        String[] timeArray = convertStringToArray(alarm.getAlarmTime());
-        holder.timeView.setText(timeArray[0] + ":" + timeArray[1]);
-        holder.weekDayView.setText(alarm.getWeekDay());
-        holder.receiverView.setText("To" + " " + alarm.getReceiverName());
-        holder.alarmRow.setTag(alarm);
+        TimePicker timePicker = CalendarUtil.convertMillisecondsToDate(mContext, alarm.getAlarmTime());
+        String formatedHour = CalendarUtil.formatAlarmTime(timePicker.getCurrentHour());
+        String formatedMinute = CalendarUtil.formatAlarmTime(timePicker.getCurrentMinute());
 
+        holder.timeView.setText(formatedHour + ":" + formatedMinute);
+        holder.weekDayView.setText(alarm.getWeekDay());
+        holder.alarmRow.setTag(alarm);
     }
 
     @Override
@@ -69,7 +70,6 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
     public Object getItem(int position) {
         return alarmList.size() > 0 ? null : alarmList.get(position);
     }
-
 
     private String[] convertStringToArray(String string) {
         String[] array = string.split(",");

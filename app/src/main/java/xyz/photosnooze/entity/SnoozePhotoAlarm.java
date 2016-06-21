@@ -5,7 +5,7 @@ package xyz.photosnooze.entity;
  */
 public class SnoozePhotoAlarm {
     private int id;
-    private String alarmTime;
+    private long alarmTime;
     private String weekDay;
     private String receiverName;
 
@@ -13,7 +13,7 @@ public class SnoozePhotoAlarm {
 
     }
 
-    public SnoozePhotoAlarm(String time, String weekDay, String name) {
+    public SnoozePhotoAlarm(long time, String weekDay, String name) {
         this.alarmTime = time;
         this.weekDay = weekDay;
         this.receiverName = name;
@@ -27,11 +27,11 @@ public class SnoozePhotoAlarm {
         this.id = id;
     }
 
-    public String getAlarmTime() {
+    public long getAlarmTime() {
         return alarmTime;
     }
 
-    public void setAlarmTime(String alarmTime) {
+    public void setAlarmTime(long alarmTime) {
         this.alarmTime = alarmTime;
     }
 

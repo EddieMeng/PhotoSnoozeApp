@@ -19,8 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:clickable="true"
-        android:background="?android:attr/selectableItemBackground"
         >
 
         <TextView
@@ -33,9 +31,10 @@
 
         <ImageView
             android:id="@+id/addAlarmButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@mipmap/img_create_alarm"
+            android:scaleType="centerCrop"
             android:layout_alignParentRight="true"
             />
     </RelativeLayout>
@@ -46,12 +45,26 @@
         android:background="@android:color/darker_gray"
         />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/alarmView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </android.support.v7.widget.RecyclerView>
 
+        <TextView
+            android:id="@+id/emptyAlarmView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Click Button Set Up Snooze Alarm"
+            android:gravity="center"
+            android:textSize="25sp"
+            android:visibility="gone"
+            />
 
+    </FrameLayout>
 
 </LinearLayout>

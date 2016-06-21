@@ -35,7 +35,7 @@ public class MessageStorage{
     }
 
     private void openDataBase() {
-        sqliteHelper = new PSSQLiteHelper(ApplicationLoader.applicatioonContext);
+        sqliteHelper = new PSSQLiteHelper(ApplicationLoader.applicationContext);
     }
 
 

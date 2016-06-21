@@ -17,7 +17,6 @@ public class AndroidUtilities {
         } else {
             ApplicationLoader.applicationHandler.postDelayed(runnable, delay);
         }
-
     }
 
 
